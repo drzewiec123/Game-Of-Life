@@ -1,0 +1,21 @@
+#version 430 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(r8ui, binding = 1) uniform restrict readonly uimage2D uOldBoard;
+layout(r8ui, binding = 2) uniform restrict writeonly uimage2D uNewBoard;
+
+void main()
+{
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    uint sum = imageLoad(uOldBoard, pos + ivec2(-1, -1)).r
+             + imageLoad(uOldBoard, pos + ivec2(-1,  0)).r
+             + imageLoad(uOldBoard, pos + ivec2(-1,  1)).r
+             + imageLoad(uOldBoard, pos + ivec2( 0,  1)).r
+             + imageLoad(uOldBoard, pos + ivec2( 1,  1)).r
+             + imageLoad(uOldBoard, pos + ivec2( 1,  0)).r
+             + imageLoad(uOldBoard, pos + ivec2( 1, -1)).r
+             + imageLoad(uOldBoard, pos + ivec2( 0, -1)).r;
+    uint mid = imageLoad(uOldBoard, pos).r + sum;
+    imageStore(uNewBoard, pos, uvec4((sum == 3 || mid == 3) ? 1 : 0, 0, 0, 0));
+}
