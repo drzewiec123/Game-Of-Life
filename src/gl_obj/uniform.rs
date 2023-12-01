@@ -50,6 +50,12 @@ impl UniformType for glam::Mat2 {
     }
 }
 
+impl UniformType for glam::Mat3 {
+    fn send_to(&self, location: gl::types::GLint) {
+        unsafe { gl::UniformMatrix3fv(location, 1, gl::FALSE, slice::from_ref(self).as_ptr() as *const gl::types::GLfloat); }
+    }
+}
+
 impl UniformType for glam::Mat4 {
     fn send_to(&self, location: gl::types::GLint) {
         unsafe { gl::UniformMatrix4fv(location, 1, gl::FALSE, slice::from_ref(self).as_ptr() as *const gl::types::GLfloat); }

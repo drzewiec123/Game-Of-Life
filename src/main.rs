@@ -9,7 +9,7 @@ mod board_display;
 mod board_state;
 mod registry;
 
-use std::{iter, path::Path, time::Duration};
+use std::{iter, path::Path};
 use board_display::BoardDisplay;
 use board_state::BoardState;
 use registry::Registry;
@@ -25,7 +25,7 @@ fn main() {
 
     let resources = resources::Resources::from_relative_exe_path(Path::new("assets/shaders")).unwrap();
     let registry = Registry::load(&resources).unwrap();
-    let mut display = BoardDisplay::new(&registry.program_registry, 900 as f32 / 700 as f32).unwrap();
+    let mut display = BoardDisplay::new(&registry.program_registry, glam::ivec2(900, 700)).unwrap();
     let data : &[gl::types::GLubyte] = &[
         1, 0, 0, 0, 0, 0, 0, 1,
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -54,18 +54,18 @@ fn main() {
                         match win_event {
                             WindowEvent::SizeChanged(w, h) => {
                                 context.set_viewport(glam::ivec2(w, h));
-                                display.set_aspect_ratio(w as f32 / h as f32);
+                                display.update_window_size(glam::ivec2(w, h));
                             },
                             _ => redrawing_event_occured = false,
                         }
                     },
                     Event::MouseButtonDown { mouse_btn, ..} => {
                         match mouse_btn {
-                            MouseButton::Left => board_state.step(),
+                            MouseButton::Right => board_state.step(),
                             _ => redrawing_event_occured = false
                         }
                     }
-                    _ => redrawing_event_occured = false,
+                    _ => redrawing_event_occured = display.handle_event(event),
                 }
                 update = update || redrawing_event_occured;
             }
